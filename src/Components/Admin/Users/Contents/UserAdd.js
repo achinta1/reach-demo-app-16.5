@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link,Redirect } from 'react-router-dom';
 import axios from 'axios';
 import {apiDomainPath} from './../../../../GlobalConfig';
+import Loader from 'react-loader-spinner';
 class UserAdd extends Component {
   //======== constructor call =======
   constructor(props){
@@ -9,7 +10,8 @@ class UserAdd extends Component {
     this.state = {
       fields: {},
       errors:{},
-      formsubmitted:false
+      formsubmitted:false,
+      loaderAppear:false
     }
   }
   // error handle
@@ -23,11 +25,12 @@ class UserAdd extends Component {
     var _this=this;
     if(this.handleValidation()){
       //alert("Form submitted");
+      _this.setState({loaderAppear:true});
       axios.post(apiDomainPath.path+'/add.php',this.state.fields,{headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }})
       .then(function(res){
-        _this.setState({formsubmitted:true});
+        _this.setState({formsubmitted:true,loaderAppear:false});
       })
       .catch(function(e) {
         console.log("ERROR ", e);
@@ -91,7 +94,12 @@ class UserAdd extends Component {
       return (
         <div className="content-wrapper">
           <div className="row">
-            <div className="col-md-6 grid-margin stretch-card">
+            {this.state.loaderAppear ? (
+              <div className="col-lg-12 inner-content-loader">
+                <Loader type="Bars" color="#1ec4d8" height={80} width={100} />
+              </div>
+            ) :(
+              <div className="col-md-6 grid-margin stretch-card">
                 <div className="card">
                   <div className="card-body">
                     <h4 className="card-title">Manage Users <span className="pull-right"> <Link to="/admin/user-list" style={{textDecoration:'none'}}><i className="fa fa-long-arrow-left"></i> Back</Link></span></h4>
@@ -137,6 +145,7 @@ class UserAdd extends Component {
                   </div>
                 </div>
               </div>
+            )}
           </div>
         </div>
       );
